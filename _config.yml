@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: The Bloggining (3)
+title: The Bloggining (4)
 email: mathew.benson@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   The Bloggining! A catalog of projects and all things embedded programming, electrical and electronics design
