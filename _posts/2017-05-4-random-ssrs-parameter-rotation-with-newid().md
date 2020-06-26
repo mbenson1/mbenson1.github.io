@@ -1,0 +1,13 @@
+---
+layout: post
+title:  "Random SSRS Parameter Rotation with NEWID()"
+date:   2017-05-04 12:00:00 -0700
+---
+
+SQL Reporting Services (SSRS) is a great way to generate reports if you’re in a Windows SQL Server environment. Inevitably a production or business intelligence dashboard will be created that will need to be displayed on a large monitor or projector. SSRS report pages can be refreshed on a timed interval but rotating between different reports or iterating through a parameter list isn’t supported. I found a nice little article [here](https://www.ticomix.com/crm/blogs/crm/3-steps-to-creating-rotating-display-of-multiple-ssrs-reports/) on creating a rotating display of multiple reports but I was momentarily stumped on a way to easily iterate through a parameter list. Some initial thoughts were to create a JSON feed and use something like [Chrome Kiosk](https://chrome.google.com/webstore/detail/kiosk/afhcomalholahplbjhnmahkoekoijban?hl=en). Since parameters can be passed in a URL this seemed to be a viable option but a bit too complicated. I could have also created a Windows form application and used a webbrowser control but I decided I wanted to keep the solution inside of SSRS. I started off researching how an iterator could be created in SQL Server. The problem immediately was that I needed the equivalent of a static variable in SQL. Something that would retain its value between function calls (without the function call part because user defined functions can’t contain side-effecting operations). Persistent variables in SQL Server are a little different to implement. I was halfway down the path of creating some kind of stored procedure that would use a global temporary table for a persistent variable when I realized that iterating through the parameters in a specific order wasn’t really a requirement. The goal was to spend an equal amount of time viewing a report generated from each parameter available so they didn’t have to be viewed in order, especially since the viewer would be randomly looking at a dashboard throughout the day. This meant I could simply randomize the parameter each time the report refreshed. I created a view that would filter a list of parameters then another view that was the equivalent of the following query:  
+  
+SELECT TOP 1 *  
+FROM Table1  
+ORDER BY NEWID()  
+  
+[NEWID()](https://msdn.microsoft.com/en-us/library/cc441928.aspx) generates a globally unique ID for each row and ORDER BY sorts those random IDs. SELECT TOP 1 takes the first record from the random sorted rows. With that view I could then just use a WHERE clause to select a random ID. By setting SSRS to refresh on a timer and putting a browser in fullscreen mode I had a randomly rotating dashboard.   
